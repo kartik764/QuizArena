@@ -5,21 +5,30 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Server } from "socket.io";
+
 import User from "./models/User.js";
 import Room from "./models/Room.js";
 import authenticateToken from "./middleware/auth.js";
+import connectDB from "./config/db.js";
+import { initializeSocket } from "./socket/socket.js";
 
-// This command is written to use the env variable inside the file
 dotenv.config();
 
 const app = express();
 
-//Render assigns a port using an environment variable. When deployed, the backend uses that port; otherwise, it runs on port 3000 locally.
 const PORT = process.env.PORT || 5000;
+
 const server = http.createServer(app);
 
-//bring connectDB function here
-import connectDB from "./config/db.js";
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+initializeSocket(io);
 
 //function runs whether connection exist or not
 connectDB();
@@ -370,6 +379,6 @@ app.get("/rooms", authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -1,18 +1,15 @@
-function ScorePanel() {
-  const scores = [
-    {
-      name: "QuizMaster",
-      score: 2450,
-    },
-    {
-      name: "Brainiac",
-      score: 1980,
-    },
-    {
-      name: "Smartypants",
-      score: 1820,
-    },
-  ];
+interface Player{
+  socketId : string;
+  userId : string;
+  username : string;
+}
+
+interface ScorePanelProps{
+  players : Player[];
+  scores : Record<string, number>;
+}
+
+function ScorePanel({players, scores} : ScorePanelProps) {
 
   return (
     <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-6">
@@ -23,17 +20,17 @@ function ScorePanel() {
 
       <div className="space-y-4">
 
-        {scores.map((player) => (
+        {players.map((player) => (
           <div
-            key={player.name}
+            key={player.userId}
             className="flex justify-between"
           >
             <span>
-              {player.name}
+              {player.username}
             </span>
 
             <span className="font-semibold">
-              {player.score}
+              {scores[player.userId] || 0}
             </span>
 
           </div>

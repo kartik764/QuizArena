@@ -8,7 +8,6 @@ import Footer from "../components/home/Footer";
 function Home() {
   return (
     <div className="min-h-screen bg-[#00020c] text-white">
-
       <Navbar />
 
       <Hero />
@@ -20,7 +19,6 @@ function Home() {
       <CTA />
 
       <Footer />
-
     </div>
   );
 }

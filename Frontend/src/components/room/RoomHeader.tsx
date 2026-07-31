@@ -1,4 +1,11 @@
-function RoomHeader({room, handleLeaveRoom}:any) {
+interface RoomHeaderProps{
+  room : any;
+  handleLeaveRoom : () => void;
+  timeLeft : number;
+  playerCount: number;
+}
+
+function RoomHeader({room, handleLeaveRoom, timeLeft, playerCount} : RoomHeaderProps) {
    
   return (
     <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-6">
@@ -10,7 +17,7 @@ function RoomHeader({room, handleLeaveRoom}:any) {
           <div className="flex items-center gap-6 mt-3 text-gray-400">
             <p>Room ID: {room.roomCode}</p>
 
-            <p className="text-green-400">● {room.players.length} / {room.maxPlayers} Players</p>
+            <p className="text-green-400">● {playerCount} / {room.maxPlayers} Players</p>
           </div>
         </div>
 
@@ -18,7 +25,7 @@ function RoomHeader({room, handleLeaveRoom}:any) {
         <div className="text-center">
           <p className="text-gray-400 text-sm">Time Left</p>
 
-          <h2 className="text-4xl font-bold text-orange-400">00:18</h2>
+          <h2 className="text-4xl font-bold text-orange-400">00:{String(timeLeft).padStart(2,"0")}</h2>
         </div>
 
         {/* Right Section */}

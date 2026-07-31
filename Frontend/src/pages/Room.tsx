@@ -1,5 +1,8 @@
+import { useRoomSocket } from "../hooks/useRoomSocket";
+
 import RoomHeader from "../components/room/RoomHeader";
 import QuestionPanel from "../components/room/QuestionPanel";
+import WaitingPanel from "../components/room/WaitingPanel";
 import PlayersPanel from "../components/room/PlayersPanel";
 import ChatPanel from "../components/room/ChatPanel";
 import ScorePanel from "../components/room/ScorePanel";
@@ -14,6 +17,32 @@ function Room() {
   const token = sessionStorage.getItem("token");
 
   const navigate = useNavigate();
+
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+  const {
+    roomUsers,
+    hostInfo,
+    gameStarted,
+    currentQuestion,
+    startGame,
+    submitAnswer,
+    scores,
+    answerSubmitted,
+    timeLeft,
+    questionResult,
+    gameOver,
+    currentQuestionNumber,
+    totalQuestions,
+    messages,
+    sendMessage,
+  } = useRoomSocket({
+    roomCode: roomCode!,
+    userId: user.id,
+    username: user.username,
+  });
+
+  const isHost = hostInfo?.userId === user.id;
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -45,6 +74,8 @@ function Room() {
     );
   }
 
+  const players = roomUsers === null ? room.players : roomUsers;
+
   const handleLeaveRoom = async () => {
     try {
       const response = await fetch(
@@ -67,17 +98,47 @@ function Room() {
 
   return (
     <div className="min-h-screen bg-[#050816] text-white p-6">
-      <RoomHeader room={room} handleLeaveRoom={handleLeaveRoom} />
+      <RoomHeader
+        room={room}
+        handleLeaveRoom={handleLeaveRoom}
+        timeLeft={timeLeft}
+        playerCount={players.length}
+      />
 
       <div className="grid grid-cols-3 gap-6 mt-6">
         <div className="col-span-2">
-          <QuestionPanel />
+          {gameOver ? (
+            <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 min-h-162.5 flex flex-col items-center justify-center">
+              <h1 className="text-5xl font-bold mb-4">Game Over 🏆</h1>
+
+              <p className="text-gray-400 text-lg">
+                Final scores are shown on the right.
+              </p>
+            </div>
+          ) : gameStarted ? (
+            <QuestionPanel
+              question={currentQuestion}
+              onSubmit={submitAnswer}
+              answerSubmitted={answerSubmitted}
+              questionResult={questionResult}
+              category={room.category}
+              currentQuestionNumber={currentQuestionNumber}
+              totalQuestions={totalQuestions}
+            />
+          ) : (
+            <WaitingPanel
+              isHost={isHost}
+              playerCount={players.length}
+              maxPlayers={room?.maxPlayers || 0}
+              onStartGame={startGame}
+            />
+          )}
         </div>
 
         <div className="space-y-6">
-          <PlayersPanel players={room.players} />
-          <ChatPanel />
-          <ScorePanel />
+          <PlayersPanel players={players} />
+          <ChatPanel messages={messages} onSendMessage={sendMessage}/>
+          <ScorePanel players={players} scores={scores} />
         </div>
       </div>
     </div>
