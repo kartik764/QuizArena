@@ -6,6 +6,7 @@ import WaitingPanel from "../components/room/WaitingPanel";
 import PlayersPanel from "../components/room/PlayersPanel";
 import ChatPanel from "../components/room/ChatPanel";
 import ScorePanel from "../components/room/ScorePanel";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -106,9 +107,10 @@ function Room() {
       />
 
       <div className="grid grid-cols-3 gap-6 mt-6">
-        <div className="col-span-2">
+        {/* LEFT */}
+        <div className="col-span-2 flex">
           {gameOver ? (
-            <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 min-h-162.5 flex flex-col items-center justify-center">
+            <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 flex flex-col items-center justify-center">
               <h1 className="text-5xl font-bold mb-4">Game Over 🏆</h1>
 
               <p className="text-gray-400 text-lg">
@@ -135,9 +137,10 @@ function Room() {
           )}
         </div>
 
-        <div className="space-y-6">
+        {/* RIGHT */}
+        <div className="flex flex-col gap-6">
           <PlayersPanel players={players} />
-          <ChatPanel messages={messages} onSendMessage={sendMessage}/>
+          <ChatPanel messages={messages} onSendMessage={sendMessage} />
           <ScorePanel players={players} scores={scores} />
         </div>
       </div>

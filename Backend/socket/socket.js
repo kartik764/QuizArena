@@ -1,4 +1,5 @@
 import Room from "../models/Room.js";
+import { generateQuestions } from "../services/questionGenerator.js";
 
 const rooms = {};
 
@@ -197,7 +198,7 @@ export const initializeSocket = (io) => {
       io.to(roomId).emit("room_users", room.users);
     });
 
-    socket.on("start_game", ({ roomId }) => {
+    socket.on("start_game", async ({ roomId }) => {
       const room = rooms[roomId];
 
       if (!room) return;
@@ -208,36 +209,39 @@ export const initializeSocket = (io) => {
 
       room.game.started = true;
 
-      const questions = [
-        {
-          id: 1,
-          question: "Which planet is known as the Red Planet?",
-          options: ["Earth", "Mars", "Jupiter", "Venus"],
-          correctAnswer: "Mars",
-        },
-        {
-          id: 2,
-          question: "Which is not the name of Lord Vishnu?",
-          options: ["Ram", "Krishna", "Vaman", "Mahakaal"],
-          correctAnswer: "Mahakaal",
-        },
-        {
-          id: 3,
-          question: "Which place is not part of CharDham?",
-          options: ["Kedarnath", "Gangotri", "Haridwar", "Badrinath"],
-          correctAnswer: "Haridwar",
-        },
-      ];
+      const dbRoom = await Room.findOne({
+        roomCode: roomId,
+      });
 
-      room.game.questions = questions;
+      if (!dbRoom) {
+        return;
+      }
+
+      try {
+        const questions = await generateQuestions({
+          category: dbRoom.category,
+          difficulty: dbRoom.difficulty,
+          questionCount: dbRoom.questionCount,
+        });
+
+        room.game.questions = questions;
+      } catch (error) {
+        console.error(error);
+
+        socket.emit("question_generation_failed", {
+          message: "Unable to generate questions. Please try again.",
+        });
+
+        return;
+      }
       room.game.currentQuestionIndex = 0;
 
       io.to(roomId).emit("game_started");
 
       io.to(roomId).emit("current_question", {
-        question : room.game.questions[0],
-        currentQuestionNumber : 1,
-        totalQuestions : room.game.questions.length,
+        question: room.game.questions[0],
+        currentQuestionNumber: 1,
+        totalQuestions: room.game.questions.length,
       });
 
       startQuestionTimer(io, roomId);
@@ -271,17 +275,17 @@ export const initializeSocket = (io) => {
       }
     });
 
-    socket.on("send_message", ({roomId, text}) => {
+    socket.on("send_message", ({ roomId, text }) => {
       const room = rooms[roomId];
-      if(!room) return;
+      if (!room) return;
 
       const message = {
-        userId : socket.userId,
-        username : socket.username,
+        userId: socket.userId,
+        username: socket.username,
         text,
       };
 
       io.to(roomId).emit("room_message", message);
-    })
+    });
   });
 };

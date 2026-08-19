@@ -72,7 +72,7 @@ function QuestionPanel({
     totalQuestions > 0 ? (currentQuestionNumber / totalQuestions) * 100 : 0;
 
   return (
-    <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
+    <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 w-full h-full flex flex-col">
       {/* Progress */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl">

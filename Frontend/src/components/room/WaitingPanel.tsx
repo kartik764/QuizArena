@@ -12,7 +12,7 @@ function WaitingPanel({
   onStartGame,
 }: WaitingPanelProps) {
   return (
-    <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 flex flex-col justify-center items-center min-h-162.5">
+    <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 flex flex-col justify-center items-center w-full h-full">
       <div className="text-center">
         <div className="text-6xl mb-6">🎮</div>
 
