@@ -1,197 +1,199 @@
 # 🎯 QuizArena
 
-A real-time multiplayer quiz platform where users can create or join quiz rooms, compete with friends, and view live scores. Built using the MERN stack with Socket.IO for real-time communication.
+> Real-time multiplayer quiz platform where users can create or join quiz rooms, compete with friends, answer questions in real time, and climb the leaderboard.
 
----
+![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript)
+![Node.js](https://img.shields.io/badge/Backend-Node.js-green?style=for-the-badge&logo=node.js)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-darkgreen?style=for-the-badge&logo=mongodb)
+![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO-black?style=for-the-badge&logo=socket.io)
+![Vercel](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)
+![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)
+
+[🚀 Live Demo](https://quiz-arena-z116fpbms-kartik-jain-s-projects.vercel.app/)
 
 ## 🚀 Features
 
-- 🔐 JWT Authentication (Register/Login)
-- 🏠 Create and Join Quiz Rooms
-- 👥 Public & Private Rooms
-- ⚡ Real-Time Multiplayer Gameplay using Socket.IO
-- 📊 Live Leaderboard
-- 🎯 Dynamic Score Tracking
-- 💬 In-Room Chat *(if implemented)*
-- 📱 Fully Responsive User Interface
+### 🔐 Authentication
+- User registration and login
+- JWT-based authentication
+- Password hashing with bcrypt
+- Protected API routes
 
----
+### 🏠 Quiz Rooms
+- Create and join quiz rooms
+- Public and private rooms
+- Share rooms using a unique Room Code
+- Configurable player limits
+- Configurable question count
+- Multiple quiz categories
+- Multiple difficulty levels
 
-## 🛠️ Tech Stack
+### ⚡ Real-Time Multiplayer
+- Socket.IO-based real-time communication
+- Real-time player updates
+- Real-time question delivery
+- Synchronized quiz gameplay
+- Real-time score updates
+- Player join and leave events
+- Disconnect handling
 
-### Frontend
-- React.js
-- TypeScript
-- Tailwind CSS
-- React Router
-- Axios
+### 🎯 Quiz Gameplay
+- Timed quiz questions
+- Automatic question progression
+- Multiple-choice questions
+- Score calculation based on correct answers
+- Real-time game state synchronization
+- Automatic game completion
 
-### Backend
-- Node.js
-- Express.js
-- Socket.IO
-- JWT Authentication
-- Bcrypt
+### 💬 Real-Time Chat
+- In-room multiplayer chat
+- Real-time message delivery
+- Player-specific chat messages
 
-### Database
-- MongoDB
-- Mongoose
+### 🏆 Leaderboard
+- Live leaderboard
+- Player score tracking
+- Global leaderboard
+- Game statistics
 
-### Tools
-- Git
-- GitHub
-- Postman
-- VS Code
+### 👤 User Profiles
+- User profile information
+- Total score tracking
+- Games played statistics
+- Personal performance overview
 
----
+## 🏗️ Architecture
 
-## 📂 Project Structure
+QuizArena follows a full-stack architecture where REST APIs handle persistent application data and Socket.IO handles real-time multiplayer communication.
 
-```
-QuizArena
-│
-├── Frontend
-│   ├── src
-│   ├── public
-│   ├── package.json
-│   └── ...
-│
-├── Backend
-│   ├── models
-│   ├── routes
-│   ├── middleware
-│   ├── controllers
-│   ├── socket
-│   ├── package.json
-│   └── ...
-│
-└── README.md
-```
-
----
-
-## ⚙️ Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/<your-username>/QuizArena.git
-```
-
-```bash
-cd QuizArena
-```
-
----
-
-### 2. Install Frontend Dependencies
-
-```bash
-cd Frontend
-npm install
+```text
+                         ┌─────────────────────┐
+                         │   React + TypeScript │
+                         │       Frontend      │
+                         └──────────┬──────────┘
+                                    │
+                       ┌────────────┴────────────┐
+                       │                         │
+                    REST API                 Socket.IO
+                       │                         │
+                       ▼                         ▼
+                ┌──────────────────────────────────┐
+                │        Node.js + Express         │
+                │                                  │
+                │  Authentication                  │
+                │  Room Management                 │
+                │  Quiz Management                 │
+                │  Leaderboard                     │
+                │  Socket.IO Server                │
+                └──────────────┬───────────────────┘
+                               │
+                               ▼
+                       ┌────────────┐
+                       │  MongoDB   │
+                       │   Atlas    │
+                       └────────────┘
 ```
 
----
+## ⚡ Real-Time Architecture
 
-### 3. Install Backend Dependencies
+QuizArena uses **Socket.IO** to synchronize quiz state between players connected to the same room.
 
-```bash
-cd ../Backend
-npm install
-```
+The server acts as the central authority for the game. When a player joins, answers a question, sends a message, or when the timer changes the game state, Socket.IO broadcasts the required updates to other players.
 
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file inside the **Backend** directory.
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-```
-
----
-
-## ▶️ Running the Application
-
-### Start Backend
-
-```bash
-cd Backend
-npm run dev
-```
-
----
-
-### Start Frontend
-
-```bash
-cd Frontend
-npm run dev
-```
-
-The application will be available at:
+```text
+Player 1
+   │
+   │ Join / Answer / Chat
+   ▼
+Socket.IO Server
+   │
+   ├──────────────► Player 2
+   │
+   ├──────────────► Player 3
+   │
+   └──────────────► Player 4
 
 ```
-Frontend : http://localhost:5173
-Backend  : http://localhost:5000
-```
 
----
+## 🧠 Engineering Challenges & Solutions
 
-## 📸 Screenshots
+### ⚡ Real-Time Multiplayer Synchronization
 
-> Add screenshots here after deployment.
+**Challenge:**  
+Multiple players inside the same room need to receive the same game state and updates in real time.
 
-### Landing Page
+**Solution:**  
+Socket.IO is used to maintain real-time communication between the client and server. Room-based communication synchronizes player joins, questions, answers, scores, and chat messages.
 
-<img src="screenshots/landing.png" width="800"/>
+### ⏱️ Timed Quiz Management
 
-### Dashboard
+**Challenge:**  
+Every player needs to follow the same question timer and quiz progression.
 
-<img src="screenshots/dashboard.png" width="800"/>
+**Solution:**  
+The server controls the quiz timer and question progression, ensuring that all connected players receive synchronized game-state updates.
 
-### Quiz Room
+### 👥 Real-Time Player Management
 
-<img src="screenshots/room.png" width="800"/>
+**Challenge:**  
+Players can join, leave, refresh the page, or disconnect unexpectedly.
 
----
+**Solution:**  
+Socket.IO connection and disconnection events are used to maintain the active player list and keep room state synchronized.
 
-## 🔮 Future Enhancements
+### 🏆 Real-Time Score Tracking
 
-- AI-generated quiz questions
-- Categories and difficulty levels
-- Timer-based gameplay
-- Spectator Mode
-- Voice Chat
-- Global Leaderboard
-- User Profiles
-- Achievements & Badges
-- Match History
-- Docker Deployment
+**Challenge:**  
+Players need to see score changes immediately after answering questions.
 
----
+**Solution:**  
+The server calculates scores and broadcasts updated player scores to everyone in the room.
 
-## 🤝 Contributing
+### 🔐 Secure Authentication
 
-Contributions, issues, and feature requests are welcome.
+**Challenge:**  
+Protected routes and user-specific data require secure authentication.
 
-Feel free to fork the repository and submit a pull request.
+**Solution:**  
+JWT is used for authentication, while bcrypt is used to hash passwords before storing them in MongoDB.
 
----
+### 🤖 Dynamic Question Generation
 
-## 📧 Contact
+**Challenge:**  
+Maintaining a large static question bank for different categories and difficulty levels can become difficult to manage.
+
+**Solution:**  
+QuizArena uses the Gemini API to dynamically generate quiz questions based on the selected category, difficulty, and question count.
+
+## 🌍 Deployment
+
+| Service | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | MongoDB Atlas |
+
+### Live Application
+
+**Frontend:** https://quiz-arena-z116fpbms-kartik-jain-s-projects.vercel.app/
+
+**Backend:** https://kartik-qz-847291-api.onrender.com/
+
+## 🔮 Future Improvements
+
+- 🎮 More quiz game modes
+- 👥 Team-based multiplayer quizzes
+- 🥇 Advanced ranking and matchmaking
+- 📊 Detailed player performance analytics
+- 🏅 Achievements and badges
+- 🔔 In-app notifications
+- 📱 Improved mobile experience
+- 🛡️ Better moderation and room controls
+- 📈 Improved monitoring and error handling
+
+- ## 👨‍💻 Author
 
 **Kartik Jain**
 
-- GitHub: https://github.com/kartik764
-- LinkedIn: https://linkedin.com/in/kartik-jain-a48b59358
-- Email: kartikjainn2003@gmail.com
-
----
-
-## ⭐ Show Your Support
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
+[GitHub](https://github.com/kartik764) • [LinkedIn](https://www.linkedin.com/in/kartik-jain-a48b59358/)
