@@ -25,7 +25,7 @@ function CreateRoom() {
       }
 
       //send request to backend
-      const response = await fetch("http://localhost:5000/room/create", {
+      const response = await fetch("http://localhost:5000/api/rooms/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

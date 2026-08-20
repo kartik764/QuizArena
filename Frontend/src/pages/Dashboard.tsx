@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/dashboard/Sidebar";
@@ -9,48 +9,69 @@ import ActiveRoom from "../components/dashboard/ActiveRooms";
 import TopScore from "../components/dashboard/TopScore";
 import BottomCTA from "../components/dashboard/BottomCTA";
 
-function Dashboard(){
+function Dashboard() {
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    const navigate = useNavigate();
+  useEffect(() => {
+    const existingToken = sessionStorage.getItem("token");
 
-    //useEffect runs
-    useEffect(()=>{
-       
-        //get token
-        const existingToken = sessionStorage.getItem("token");
+    if (!existingToken) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
-        if(!existingToken){
-            navigate("/login");
-        }
-        
-    },[navigate]);
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
 
-    return (
-        <div className="min-h-screen flex bg-[#050816] text-white">
-            <Sidebar/>
+  return (
+    <div className="min-h-screen bg-[#070812] text-[#F8FAFC]">
+      <div className="flex min-h-screen">
 
-            <main className="flex-1 p-8">
-                <Topbar/>
+        {/* Sidebar */}
+        <Sidebar
+          open={sidebarOpen}
+          onToggle={toggleSidebar}
+        />
 
-                <WelcomeBanner/> 
+        {/* Main content */}
+        <div className="flex min-w-0 flex-1 flex-col">
 
-                <StatsSection/>
+          {/* Top navigation */}
+          <Topbar onMenuClick={toggleSidebar} />
 
-                <div className="grid grid-cols-3 gap-6">
+          {/* Dashboard content */}
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-400 space-y-6">
 
-                    <div className="col-span-2">
-                        <ActiveRoom/>
-                    </div>
+              {/* Welcome / Hero */}
+              <WelcomeBanner />
 
-                    <div>
-                        <TopScore/>
-                    </div>
-                </div>
+              {/* Stats */}
+              <StatsSection />
 
-                <BottomCTA/>
-            </main> 
+              {/* Rooms + Leaderboard */}
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+                <section className="min-w-0">
+                  <ActiveRoom />
+                </section>
+
+                <aside className="min-w-0">
+                  <TopScore />
+                </aside>
+              </div>
+
+              {/* Bottom CTA */}
+              <BottomCTA />
+
+            </div>
+          </main>
+
         </div>
-    )
+      </div>
+    </div>
+  );
 }
 
 export default Dashboard;

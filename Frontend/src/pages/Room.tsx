@@ -48,7 +48,7 @@ function Room() {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/room/${roomCode}`, {
+        const response = await fetch(`http://localhost:5000/api/rooms/${roomCode}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +80,7 @@ function Room() {
   const handleLeaveRoom = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/room/${roomCode}/leave`,
+        `http://localhost:5000/api/rooms/${roomCode}/leave`,
         {
           method: "POST",
           headers: {

@@ -1,90 +1,70 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Bell, Menu, Search } from "lucide-react";
 
-function Topbar() {
-  const [roomCode, setRoomCode] = useState("");
+interface TopbarProps {
+  onMenuClick: () => void;
+}
 
-  const navigate = useNavigate();
-
+function Topbar({ onMenuClick }: TopbarProps) {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
-  const initial = user.username?.charAt(0).toUpperCase() || "?";
-
-  const handleJoinRoom = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-
-      if (!token) {
-        alert("Please Login First");
-        return;
-      }
-
-      const response = await fetch("http://localhost:5000/room/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          roomCode,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
-
-      //success
-      navigate(`/room/${data.roomCode}`);
-    } catch (error) {
-      console.error("Join Room Error:", error);
-      alert("Failed to join room");
-    }
-  };
+  const username = user.username || "User";
+  const initial = username.charAt(0).toUpperCase();
 
   return (
-    <div className="flex items-center justify-between mb-8">
-      {/* Left Side */}
-      <div className="flex items-center gap-4">
-        {/* Search */}
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.07] bg-[#0d1224]/80 px-4 backdrop-blur-xl md:px-6">
+      {/* Mobile menu */}
+      <button
+        onClick={onMenuClick}
+        className="rounded-md p-2 text-slate-400 transition-colors hover:bg-white/6 hover:text-white lg:hidden"
+        aria-label="Open navigation"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Search */}
+      <div className="relative hidden flex-1 sm:block md:max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+
         <input
-          type="text"
+          type="search"
           placeholder="Search rooms, players..."
-          className="w-96 bg-[#0f172a] border border-gray-800 rounded-xl px-4 py-3 outline-none"
+          className="h-10 w-full rounded-lg border border-white/8 bg-[#070812] pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20"
         />
-
-        {/* Room Code */}
-        <input
-          type="text"
-          placeholder="Room Code"
-          value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-          className="w-40 bg-[#0f172a] border border-gray-800 rounded-xl px-4 py-3 outline-none"
-        />
-
-        {/* Join Room */}
-        <button
-          onClick={handleJoinRoom}
-          className="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-xl font-semibold"
-        >
-          Join Room
-        </button>
       </div>
 
-      {/* Right Side */}
-      <div className="flex items-center gap-4">
-        <button className="w-12 h-12 rounded-full bg-[#0f172a] border border-gray-800">
-          🔔
+      <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+        {/* Join Room */}
+        <div className="hidden items-center gap-2 md:flex">
+          <input
+            type="text"
+            placeholder="Room code"
+            className="h-10 w-28 rounded-lg border border-white/8 bg-[#070812] px-3 text-sm uppercase tracking-wider text-white outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-500 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
+          />
+
+          <button className="h-10 rounded-lg bg-cyan-400/15 px-4 text-sm font-semibold text-cyan-300 transition-colors hover:bg-cyan-400/25">
+            Join Room
+          </button>
+        </div>
+
+        {/* Notifications */}
+        <button
+          className="relative rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/6 hover:text-white"
+          aria-label="Notifications"
+        >
+          <Bell className="h-5 w-5" />
+
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#0d1224]" />
         </button>
 
-        <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center font-bold">
+        {/* User avatar */}
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-violet-600 to-fuchsia-500 text-sm font-bold text-white ring-2 ring-violet-500/30"
+          title={username}
+        >
           {initial}
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
