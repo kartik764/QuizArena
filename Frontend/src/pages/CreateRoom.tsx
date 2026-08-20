@@ -50,7 +50,7 @@ function CreateRoom() {
       setCreating(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/rooms/create",
+        `${import.meta.env.VITE_API_URL}/api/rooms/create`,
         {
           method: "POST",
           headers: {

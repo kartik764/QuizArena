@@ -50,7 +50,7 @@ function Room() {
     const fetchRoom = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/rooms/${roomCode}`,
+          `${import.meta.env.VITE_API_URL}/api/rooms/${roomCode}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ function Room() {
   const handleLeaveRoom = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/rooms/${roomCode}/leave`,
+        `${import.meta.env.VITE_API_URL}/api/rooms/${roomCode}/leave`,
         {
           method: "POST",
           headers: {

@@ -27,7 +27,7 @@ function Dashboard() {
       try {
         const token = sessionStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5000/api/rooms", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
