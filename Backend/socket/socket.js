@@ -1,15 +1,18 @@
 import Room from "../models/Room.js";
+import User from "../models/User.js";
 import { generateQuestions } from "../services/questionGenerator.js";
 
 const rooms = {};
 
-function sendNextQuestion(io, roomId) {
+async function sendNextQuestion(io, roomId) {
   const room = rooms[roomId];
   if (!room) return;
 
   room.game.currentQuestionIndex++;
 
   if (room.game.currentQuestionIndex >= room.game.questions.length) {
+    await saveGameResults(room);
+
     io.to(roomId).emit("game_over");
     return;
   }
@@ -100,9 +103,33 @@ function endQuestion(io, roomId) {
 
   io.to(roomId).emit("score_update", room.game.scores);
 
-  setTimeout(() => {
-    sendNextQuestion(io, roomId);
+  setTimeout(async () => {
+    await sendNextQuestion(io, roomId);
   }, 3000);
+}
+
+async function saveGameResults(room) {
+  if (room.game.resultsSaved) return;
+
+  room.game.resultsSaved = true;
+
+  try {
+    for (const player of room.users) {
+      const score = room.game.scores[player.userId] || 0;
+
+      await User.findByIdAndUpdate(player.userId, {
+        $inc: {
+          totalScore: score,
+          gamesPlayed: 1,
+        },
+      });
+    }
+
+    console.log("Game results saved to database.");
+  } catch (error) {
+    room.game.resultsSaved = false;
+    console.error("Failed to save game results:", error);
+  }
 }
 
 export const initializeSocket = (io) => {
@@ -131,6 +158,7 @@ export const initializeSocket = (io) => {
             submittedUsers: new Set(),
             answers: {},
             questionEnded: false,
+            resultsSaved: false,
           },
         };
       }
@@ -207,13 +235,14 @@ export const initializeSocket = (io) => {
 
       if (room.game.started) return;
 
-      room.game.started = true;
-
       const dbRoom = await Room.findOne({
         roomCode: roomId,
       });
 
       if (!dbRoom) {
+        socket.emit("question_generation_failed", {
+          message: "Room not found.",
+        });
         return;
       }
 
@@ -234,6 +263,8 @@ export const initializeSocket = (io) => {
 
         return;
       }
+
+      room.game.started = true;
       room.game.currentQuestionIndex = 0;
 
       io.to(roomId).emit("game_started");

@@ -16,7 +16,18 @@ const roomSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["Science", "History", "Sports", "Technology"],
+      enum: [
+        "Science",
+        "History",
+        "Sports",
+        "Technology",
+        "Geography",
+        "Movies & TV",
+        "Music",
+        "General Knowledge",
+        "Programming",
+        "Literature",
+      ],
       default: "",
     },
 
@@ -40,7 +51,7 @@ const roomSchema = new mongoose.Schema(
     questionCount: {
       type: Number,
       required: true,
-      min: 1,
+      min: 2,
     },
 
     host: {
@@ -64,7 +75,7 @@ const roomSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Room = mongoose.model("Room", roomSchema);

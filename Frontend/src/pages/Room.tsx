@@ -6,6 +6,7 @@ import WaitingPanel from "../components/room/WaitingPanel";
 import PlayersPanel from "../components/room/PlayersPanel";
 import ChatPanel from "../components/room/ChatPanel";
 import ScorePanel from "../components/room/ScorePanel";
+import GameOverPanel from "../components/room/GameOverPanel";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -48,11 +49,14 @@ function Room() {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rooms/${roomCode}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `http://localhost:5000/api/rooms/${roomCode}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         const data = await response.json();
 
@@ -102,7 +106,6 @@ function Room() {
       <RoomHeader
         room={room}
         handleLeaveRoom={handleLeaveRoom}
-        timeLeft={timeLeft}
         playerCount={players.length}
       />
 
@@ -110,13 +113,12 @@ function Room() {
         {/* LEFT */}
         <div className="col-span-2 flex">
           {gameOver ? (
-            <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 flex flex-col items-center justify-center">
-              <h1 className="text-5xl font-bold mb-4">Game Over 🏆</h1>
-
-              <p className="text-gray-400 text-lg">
-                Final scores are shown on the right.
-              </p>
-            </div>
+            <GameOverPanel
+              players={players}
+              scores={scores}
+              currentUserId={user.id}
+              onBackToDashboard={handleLeaveRoom}
+            />
           ) : gameStarted ? (
             <QuestionPanel
               question={currentQuestion}
@@ -124,14 +126,17 @@ function Room() {
               answerSubmitted={answerSubmitted}
               questionResult={questionResult}
               category={room.category}
+              difficulty={room.difficulty}
               currentQuestionNumber={currentQuestionNumber}
               totalQuestions={totalQuestions}
+              timeLeft={timeLeft}
             />
           ) : (
             <WaitingPanel
               isHost={isHost}
               playerCount={players.length}
               maxPlayers={room?.maxPlayers || 0}
+              roomCode={room.roomCode}
               onStartGame={startGame}
             />
           )}
@@ -139,9 +144,22 @@ function Room() {
 
         {/* RIGHT */}
         <div className="flex flex-col gap-6">
-          <PlayersPanel players={players} />
-          <ChatPanel messages={messages} onSendMessage={sendMessage} />
-          <ScorePanel players={players} scores={scores} />
+          <PlayersPanel
+            players={players}
+            hostInfo={hostInfo}
+            currentUserId={user.id}
+            scores={scores}
+          />
+          <ChatPanel
+            messages={messages}
+            onSendMessage={sendMessage}
+            currentUserId={user.id}
+          />
+          <ScorePanel
+            players={players}
+            scores={scores}
+            currentUserId={user.id}
+          />
         </div>
       </div>
     </div>

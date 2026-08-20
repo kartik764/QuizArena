@@ -1,4 +1,6 @@
 import { Bell, Menu, Search } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -9,6 +11,46 @@ function Topbar({ onMenuClick }: TopbarProps) {
 
   const username = user.username || "User";
   const initial = username.charAt(0).toUpperCase();
+
+  const [roomCode, setRoomCode] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleJoinRoom = async () => {
+    const code = roomCode.trim();
+
+    if (!code) return;
+
+    const token = sessionStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/rooms/join",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            roomCode: code,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Unable to join room");
+        return;
+      }
+
+      navigate(`/room/${code}`);
+    } catch (error) {
+      console.error("Join Room Error:", error);
+      alert("Something went wrong while joining the room.");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.07] bg-[#0d1224]/80 px-4 backdrop-blur-xl md:px-6">
@@ -37,11 +79,21 @@ function Topbar({ onMenuClick }: TopbarProps) {
         <div className="hidden items-center gap-2 md:flex">
           <input
             type="text"
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleJoinRoom();
+              }
+            }}
             placeholder="Room code"
             className="h-10 w-28 rounded-lg border border-white/8 bg-[#070812] px-3 text-sm uppercase tracking-wider text-white outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-500 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
           />
 
-          <button className="h-10 rounded-lg bg-cyan-400/15 px-4 text-sm font-semibold text-cyan-300 transition-colors hover:bg-cyan-400/25">
+          <button
+            onClick={handleJoinRoom}
+            className="h-10 rounded-lg bg-cyan-400/15 px-4 text-sm font-semibold text-cyan-300 transition-colors hover:bg-cyan-400/25"
+          >
             Join Room
           </button>
         </div>

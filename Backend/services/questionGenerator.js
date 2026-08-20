@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import dotenv, { parse } from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -30,7 +30,7 @@ function buildPrompt({ category, difficulty, questionCount }) {
         "correctAnswer": ""
       }
     ]
-    `;
+  `;
 }
 
 // 2. Call Gemini
@@ -44,13 +44,26 @@ async function callGemini(prompt) {
 
       return response.text;
     } catch (error) {
-      console.log(`Attempt ${attempt} failed.`);
+      console.log(`Attempt ${attempt} failed:`, error.message);
 
+      const message = error.message || "";
+
+      // Quota exceeded — don't keep sending requests
+      if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED")) {
+        throw new Error(
+          "Gemini API quota exceeded. Please wait and try again later.",
+        );
+      }
+
+      // Last attempt
       if (attempt === 3) {
         throw new Error(
           `Failed to generate questions after 3 attempts: ${error.message}`,
         );
       }
+
+      // Wait before retrying temporary 503 errors
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
 }
